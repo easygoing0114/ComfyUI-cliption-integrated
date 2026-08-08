@@ -1,0 +1,13 @@
+[project]
+name = "comfyui-cliption-integrated"
+description = "Integrated beam-search-only fork of pharmapsychotic's ComfyUI-Cliption, combining the CLIPtion loader and beam search into a single node"
+version = "1.0.0"
+license = { file = "LICENSE" }
+
+[project.urls]
+Repository = "https://github.com/easygoing0114/ComfyUI-cliption-integrated"
+
+[tool.comfy]
+PublisherId = "easygoing0114"
+DisplayName = "Cliption Integrated"
+Icon = ""
