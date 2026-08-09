@@ -11,6 +11,7 @@ from huggingface_hub import hf_hub_download
 from safetensors import safe_open
 
 import comfy.model_management
+from comfy_api.latest import ComfyExtension, io
 
 
 def _fix_punctuation_spacing(text: str) -> str:
@@ -263,19 +264,24 @@ class CLIPtionModel(nn.Module):
         return text_embeds
 
 
-class CLIPtionBeamSearchIntegrated:
-    """
-    Combined CLIPtion loader + beam search node.
-    Loads the CLIPtion decoder on demand at caption time rather than at
-    workflow-load time, and can optionally unload it from VRAM afterwards.
-    The CLIPtion safetensors weights are kept on CPU between runs so that
-    re-loading does not require a disk read.
-    """
+class _DecoderCache:
 
-    CATEGORY = "pharmapsychotic"
-    FUNCTION = "caption"
-    OUTPUT_IS_LIST = (True,)
-    RETURN_TYPES = ("STRING",)
+    model: Optional["CLIPtionModel"] = None
+
+    @classmethod
+    def is_loaded(cls) -> bool:
+        return cls.model is not None
+
+    @classmethod
+    def set(cls, model: "CLIPtionModel") -> None:
+        cls.model = model
+
+    @classmethod
+    def clear(cls) -> None:
+        cls.model = None
+
+
+class CLIPtionBeamSearchIntegrated(io.ComfyNode):
 
     # CLIPtion decoder config (fixed for the released checkpoint)
     _CAPTIONER_CONFIG = SimpleNamespace(hidden_dim=768, num_heads=8, num_blocks=6, max_length=77)
@@ -283,54 +289,78 @@ class CLIPtionBeamSearchIntegrated:
     _HF_REPO_ID = "pharmapsychotic/CLIPtion"
     _HF_REVISION = "15ee8cb77a902616478a033332011ff640e72277"
 
-    def __init__(self):
-        self._model: Optional[CLIPtionModel] = None
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="CLIPtionBeamSearchIntegrated",
+            display_name="CLIPtion Beam Search (Integrated)",
+            category="pharmapsychotic",
+            description="Loads the CLIPtion decoder on demand and runs beam search to caption image(s), "
+            "ranking candidates by CLIP similarity to the input image.",
+            inputs=[
+                io.Clip.Input("clip", tooltip="CLIP text encoder (must include CLIP-L)."),
+                io.Custom("CLIP_VISION").Input(
+                    "clip_vision", tooltip="CLIP vision encoder (must be CLIP-L)."
+                ),
+                io.Image.Input("image"),
+                io.Int.Input(
+                    "beam_width",
+                    default=4,
+                    min=1,
+                    max=64,
+                    tooltip="Number of beams to maintain during search.",
+                ),
+                io.Boolean.Input(
+                    "unload_after_run",
+                    default=True,
+                    tooltip="Unload CLIPtion decoder from VRAM after captioning.",
+                ),
+                io.Boolean.Input(
+                    "force_cpu",
+                    default=False,
+                    optional=True,
+                    advanced=True,
+                    tooltip="Run the CLIPtion decoder on CPU instead of the default ComfyUI device.",
+                ),
+            ],
+            outputs=[
+                io.String.Output(is_output_list=True),
+            ],
+        )
 
     @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "clip": ("CLIP", {"tooltip": "CLIP text encoder (must include CLIP-L)."}),
-                "clip_vision": ("CLIP_VISION", {"tooltip": "CLIP vision encoder (must be CLIP-L)."}),
-                "image": ("IMAGE",),
-                "beam_width": (
-                    "INT",
-                    {"default": 4, "min": 1, "max": 64, "tooltip": "Number of beams to maintain during search."},
-                ),
-                "unload_after_run": (
-                    "BOOLEAN",
-                    {"default": False, "tooltip": "Unload CLIPtion decoder from VRAM after captioning."},
-                ),
-            },
-            "optional": {
-                "device": (["default", "cpu"], {"advanced": True}),
-            },
-        }
-
-    def caption(self, clip, clip_vision, image: torch.Tensor, beam_width: int = 4,
-                unload_after_run: bool = False, device: str = "default"):
+    def execute(
+        cls,
+        clip,
+        clip_vision,
+        image: torch.Tensor,
+        beam_width: int = 4,
+        unload_after_run: bool = False,
+        force_cpu: bool = False,
+    ) -> io.NodeOutput:
         try:
-            self._load_model(clip, clip_vision, device)
+            cls._load_model(clip, clip_vision, force_cpu)
             with torch.inference_mode():
-                captions = self._model.generate_beam(image, beam_width)
+                captions = _DecoderCache.model.generate_beam(image, beam_width)
         finally:
             if unload_after_run:
-                self._unload_model()
+                cls._unload_model()
 
-        return (captions,)
+        return io.NodeOutput(captions)
 
-    def _load_model(self, clip, clip_vision, device: str):
+    @classmethod
+    def _load_model(cls, clip, clip_vision, force_cpu: bool):
         """Load CLIPtion decoder from disk and move to target device."""
-        if self._model is not None:
+        if _DecoderCache.is_loaded():
             return
 
         base_path = os.path.dirname(os.path.abspath(__file__))
-        local_path = os.path.join(base_path, self._SAFETENSORS_FILE)
+        local_path = os.path.join(base_path, cls._SAFETENSORS_FILE)
         if os.path.exists(local_path):
             model_path = local_path
         else:
             model_path = hf_hub_download(
-                repo_id=self._HF_REPO_ID, filename=self._SAFETENSORS_FILE, revision=self._HF_REVISION
+                repo_id=cls._HF_REPO_ID, filename=cls._SAFETENSORS_FILE, revision=cls._HF_REVISION
             )
 
         state_dict = {}
@@ -339,8 +369,8 @@ class CLIPtionBeamSearchIntegrated:
                 state_dict[key] = f.get_tensor(key)
         tp_dict = {"weight": state_dict.pop("text_projection.weight")}
 
-        inference_device = torch.device("cpu") if device == "cpu" else None
-        model = CLIPtionModel(self._CAPTIONER_CONFIG, clip, clip_vision, device=inference_device)
+        inference_device = torch.device("cpu") if force_cpu else None
+        model = CLIPtionModel(cls._CAPTIONER_CONFIG, clip, clip_vision, device=inference_device)
         model.captioner.load_state_dict(state_dict)
         model.text_projection.load_state_dict(tp_dict)
         model.eval()
@@ -350,24 +380,24 @@ class CLIPtionBeamSearchIntegrated:
         # keep text_projection in FP32 to preserve CLIP similarity scoring accuracy
         model.text_projection.to(dtype=torch.float32)
 
-        self._model = model
-        logging.info(f"CLIPtionBeamSearchIntegrated: decoder loaded on {load_device}")
+        _DecoderCache.set(model)
+        logging.info(f"{cls.__name__}: decoder loaded on {load_device}")
 
-    def _unload_model(self):
+    @classmethod
+    def _unload_model(cls):
         """Remove the CLIPtion decoder from VRAM and CPU RAM completely."""
-        if self._model is None:
+        if not _DecoderCache.is_loaded():
             return
-        del self._model
-        self._model = None
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-        logging.info("CLIPtionBeamSearchIntegrated: decoder unloaded")
+        _DecoderCache.clear()
+        # works across CUDA/XPU/MPS, unlike calling torch.cuda directly
+        comfy.model_management.soft_empty_cache()
+        logging.info(f"{cls.__name__}: decoder unloaded")
 
 
-NODE_CLASS_MAPPINGS = {
-    "CLIPtionBeamSearchIntegrated": CLIPtionBeamSearchIntegrated,
-}
+class CLIPtionIntegratedExtension(ComfyExtension):
+    async def get_node_list(self) -> list[type[io.ComfyNode]]:
+        return [CLIPtionBeamSearchIntegrated]
 
-NODE_DISPLAY_NAME_MAPPINGS = {
-    "CLIPtionBeamSearchIntegrated": "CLIPtion Beam Search (Integrated)",
-}
+
+async def comfy_entrypoint() -> CLIPtionIntegratedExtension:
+    return CLIPtionIntegratedExtension()
