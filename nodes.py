@@ -284,7 +284,7 @@ class _DecoderCache:
 class CLIPtionBeamSearchIntegrated(io.ComfyNode):
 
     # CLIPtion decoder config (fixed for the released checkpoint)
-   _CAPTIONER_CONFIG = SimpleNamespace(hidden_dim=768, num_heads=8, num_blocks=6, max_length=77)
+    _CAPTIONER_CONFIG = SimpleNamespace(hidden_dim=768, num_heads=8, num_blocks=6, max_length=77)
     _SAFETENSORS_FILE = "CLIPtion_20241219_fp16.safetensors"
     _HF_REPO_ID = "easygoing0114/ComfyUI-use-models"
     _HF_REVISION = "4158578ad9da6f1a54338f00e4310af7f66b5eb7"
