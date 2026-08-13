@@ -1,3 +1,7 @@
+<div align="center">
+<img width="800" height="343" alt="ComfyUI Cliption Integrated Nodes thumbnail" src="images/cliption_banner_image.png">
+</div>
+
 # ComfyUI-cliption-integrated
 
 A streamlined fork of [pharmapsychotic/comfy-cliption](https://github.com/pharmapsychotic/comfy-cliption) for ComfyUI, providing a single, integrated **CLIPtion Beam Search** node.
@@ -7,6 +11,10 @@ A streamlined fork of [pharmapsychotic/comfy-cliption](https://github.com/pharma
 ## Node
 
 ### CLIPtion Beam Search (Integrated)
+
+<div align="center">
+<img width="800" height="468" alt="mask refine node sample" src="images/comfyui-cliption-integrated_sample_workflow_20260813.png">
+</div>
 
 Loads the CLIPtion decoder on demand at caption time (rather than at workflow-load time) and runs beam search to caption an image, ranking the resulting candidates by CLIP similarity to the input image.
 
