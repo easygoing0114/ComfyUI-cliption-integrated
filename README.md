@@ -24,7 +24,7 @@ Loads the CLIPtion decoder on demand at caption time (rather than at workflow-lo
 | --- | --- | --- |
 | `clip` | `CLIP` | CLIP text encoder (must include CLIP-L). |
 | `clip_vision` | `CLIP_VISION` | CLIP vision encoder (must be CLIP-L). |
-| `image` | `IMAGE` | Image(s) to caption. |
+| `image` | `IMAGE` | Inoput Image to caption. |
 | `beam_width` | `INT` | Number of beams to maintain during search (default: 4). |
 | `unload_after_run` | `BOOLEAN` | Unload the CLIPtion decoder from VRAM after captioning (default: False). |
 | `device` (optional) | `["default", "cpu"]` | Inference device override. |
@@ -35,7 +35,7 @@ Loads the CLIPtion decoder on demand at caption time (rather than at workflow-lo
 | --- | --- | --- |
 | `STRING` | `STRING` (list) | One caption per input image. |
 
-The CLIPtion decoder weights (`CLIPtion_20241219_fp16.safetensors`) are downloaded automatically from [pharmapsychotic/CLIPtion](https://huggingface.co/pharmapsychotic/CLIPtion) on Hugging Face the first time the node runs, and are cached on disk afterwards.
+The CLIPtion decoder weights (`CLIPtion_20241219_fp16.safetensors`) are downloaded automatically from [easygoing0114/ComfyUI-use-models](images/cliption_banner_image.png) on Hugging Face the first time the node runs, and are cached on disk afterwards.
 
 ## Installation
 
