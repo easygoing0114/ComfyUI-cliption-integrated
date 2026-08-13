@@ -24,7 +24,7 @@ Loads the CLIPtion decoder on demand at caption time (rather than at workflow-lo
 | --- | --- | --- |
 | `clip` | `CLIP` | CLIP text encoder (must include CLIP-L). |
 | `clip_vision` | `CLIP_VISION` | CLIP vision encoder (must be CLIP-L). |
-| `image` | `IMAGE` | Input Image to caption. |
+| `image` | `IMAGE` | Image to caption. |
 | `beam_width` | `INT` | Number of beams to maintain during search (default: 4). |
 | `unload_after_run` | `BOOLEAN` | Unload the CLIPtion decoder from VRAM after captioning (default: False). |
 | `device` (optional) | `["default", "cpu"]` | Inference device override. |
@@ -33,11 +33,11 @@ Loads the CLIPtion decoder on demand at caption time (rather than at workflow-lo
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `STRING` | `STRING` (list) | Generated caption |
+| `STRING` | `STRING` (list) | Generated caption. |
 
-The CLIPtion decoder weights (`CLIPtion_20241219_fp16.safetensors`) are downloaded automatically from [easygoing0114/ComfyUI-use-models](https://huggingface.co/easygoing0114/ComfyUI-use-models/tree/main) on Hugging Face the first time the node runs, and are cached on disk afterwards. The weights have also been mirrored to that same repository for convenience.
+The CLIPtion decoder weights (`CLIPtion_20241219_fp16.safetensors`) are downloaded automatically from [easygoing0114/ComfyUI-use-models](https://huggingface.co/easygoing0114/ComfyUI-use-models/tree/main) on Hugging Face the first time the node runs, and are saved to `ComfyUI/models/cliption` for reuse on subsequent runs. You can also place a copy of the file in that folder yourself ahead of time to skip the automatic download.
 
-### Recommended high-accuracy CLIP-L model
+### Recommended CLIP-L model
 
 For the `clip` and `clip_vision` inputs, we recommend [zer0int/CLIP-SAE-ViT-L-14](https://huggingface.co/zer0int/CLIP-SAE-ViT-L-14), a free, high-accuracy fine-tune of CLIP ViT-L/14 released by zer0int. This model has also been mirrored to the [easygoing0114/ComfyUI-use-models](https://huggingface.co/easygoing0114/ComfyUI-use-models/tree/main) repository above.
 
@@ -58,7 +58,7 @@ Restart ComfyUI. The node should now appear in the node search as **CLIPtion Bea
 ## Credits
 
 - [pharmapsychotic/comfy-cliption](https://github.com/pharmapsychotic/comfy-cliption) — original ComfyUI node pack this fork is based on.
-- [pharmapsychotic/CLIPtion](https://github.com/pharmapsychotic/CLIPtion) — the underlying CLIPtion model.
+- [pharmapsychotic/CLIPtion](https://huggingface.co/pharmapsychotic/CLIPtion) — the underlying CLIPtion model.
 - [zer0int/CLIP-SAE-ViT-L-14](https://huggingface.co/zer0int/CLIP-SAE-ViT-L-14) — recommended high-accuracy CLIP-L model, freely released by zer0int.
 
 ## License

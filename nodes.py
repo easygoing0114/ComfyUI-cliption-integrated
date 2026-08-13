@@ -11,7 +11,15 @@ from huggingface_hub import hf_hub_download
 from safetensors import safe_open
 
 import comfy.model_management
+import folder_paths
 from comfy_api.latest import ComfyExtension, io
+
+
+# register comfyui/models/cliption as a known model folder so the
+# downloaded decoder weights are cached alongside ComfyUI's other models
+_CLIPTION_MODELS_DIR = os.path.join(folder_paths.models_dir, "cliption")
+os.makedirs(_CLIPTION_MODELS_DIR, exist_ok=True)
+folder_paths.add_model_folder_path("cliption", _CLIPTION_MODELS_DIR)
 
 
 def _fix_punctuation_spacing(text: str) -> str:
@@ -354,14 +362,25 @@ class CLIPtionBeamSearchIntegrated(io.ComfyNode):
         if _DecoderCache.is_loaded():
             return
 
-        base_path = os.path.dirname(os.path.abspath(__file__))
-        local_path = os.path.join(base_path, cls._SAFETENSORS_FILE)
-        if os.path.exists(local_path):
-            model_path = local_path
+        # 1) allow a manually placed copy anywhere under comfyui/models/cliption
+        #    (covers extra_model_paths / multiple registered search paths too)
+        existing_paths = folder_paths.get_filename_list("cliption")
+        if cls._SAFETENSORS_FILE in existing_paths:
+            model_path = folder_paths.get_full_path("cliption", cls._SAFETENSORS_FILE)
         else:
-            model_path = hf_hub_download(
-                repo_id=cls._HF_REPO_ID, filename=cls._SAFETENSORS_FILE, revision=cls._HF_REVISION
-            )
+            # 2) fall back to a copy sitting next to this node (legacy location)
+            base_path = os.path.dirname(os.path.abspath(__file__))
+            local_path = os.path.join(base_path, cls._SAFETENSORS_FILE)
+            if os.path.exists(local_path):
+                model_path = local_path
+            else:
+                # 3) download into comfyui/models/cliption and cache it there
+                model_path = hf_hub_download(
+                    repo_id=cls._HF_REPO_ID,
+                    filename=cls._SAFETENSORS_FILE,
+                    revision=cls._HF_REVISION,
+                    local_dir=_CLIPTION_MODELS_DIR,
+                )
 
         state_dict = {}
         with safe_open(model_path, framework="pt", device="cpu") as f:
