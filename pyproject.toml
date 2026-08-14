@@ -1,7 +1,7 @@
 [project]
 name = "comfyui-cliption-integrated"
 description = "Integrated beam-search-only fork of pharmapsychotic's ComfyUI-Cliption, combining the CLIPtion loader and beam search into a single node"
-version = "0.1.3"
+version = "0.1.4"
 license = { text = "MIT" }
 
 [project.urls]

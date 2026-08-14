@@ -313,7 +313,7 @@ class CLIPtionBeamSearchIntegrated(io.ComfyNode):
                 io.Image.Input("image"),
                 io.Int.Input(
                     "beam_width",
-                    default=4,
+                    default=9,
                     min=1,
                     max=64,
                     tooltip="Number of beams to maintain during search.",
