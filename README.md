@@ -8,7 +8,7 @@ A streamlined fork of [pharmapsychotic/comfy-cliption](https://github.com/pharma
 
 [CLIPtion](https://huggingface.co/pharmapsychotic/CLIPtion) is a fast, lightweight image captioning model built on top of CLIP. This fork updates it for ComfyUI's V3 node scheme and consolidates the node pack into a single, integrated node. Processing has been sped up for GPU inference, and a VRAM offload option has been added.
 
-## CLIPtion Beam Search (Integrated) Node
+## Workflow
 
 ### Single Image
 
