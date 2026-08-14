@@ -6,7 +6,7 @@
 
 A streamlined fork of [pharmapsychotic/comfy-cliption](https://github.com/pharmapsychotic/comfy-cliption) for ComfyUI, providing a single, integrated **CLIPtion Beam Search** node.
 
-[CLIPtion](https://github.com/pharmapsychotic/CLIPtion) is a fast, lightweight image captioning model built on top of CLIP. This fork updates it for ComfyUI's V3 node scheme and consolidates the node pack into a single, integrated node. Processing has been sped up for GPU inference, and a VRAM offload option has been added.
+[CLIPtion](https://huggingface.co/pharmapsychotic/CLIPtion) is a fast, lightweight image captioning model built on top of CLIP. This fork updates it for ComfyUI's V3 node scheme and consolidates the node pack into a single, integrated node. Processing has been sped up for GPU inference, and a VRAM offload option has been added.
 
 ## CLIPtion Beam Search (Integrated) Node
 
@@ -46,9 +46,11 @@ Loads the CLIPtion decoder on demand at caption time (rather than at workflow-lo
 | --- | --- | --- |
 | `STRING` | `STRING` (list) | Generated caption (s). |
 
+## CLIPtion Model
+
 The CLIPtion decoder weights (`CLIPtion_20241219_fp16.safetensors`) are downloaded automatically from [easygoing0114/ComfyUI-use-models](https://huggingface.co/easygoing0114/ComfyUI-use-models/tree/main) on Hugging Face the first time the node runs, and are saved to `ComfyUI/models/cliption` for reuse on subsequent runs. You can also place a copy of the file in that folder yourself ahead of time to skip the automatic download.
 
-### Recommended CLIP-L model
+## Recommended CLIP-SAE-ViT-L-14 Model
 
 For the `clip` and `clip_vision` inputs, we recommend [zer0int/CLIP-SAE-ViT-L-14](https://huggingface.co/zer0int/CLIP-SAE-ViT-L-14), a free, high-accuracy fine-tune of CLIP ViT-L/14 released by zer0int. This model has also been mirrored to the [easygoing0114/ComfyUI-use-models](https://huggingface.co/easygoing0114/ComfyUI-use-models/tree/main) repository above.
 
