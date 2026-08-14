@@ -8,32 +8,43 @@ A streamlined fork of [pharmapsychotic/comfy-cliption](https://github.com/pharma
 
 [CLIPtion](https://github.com/pharmapsychotic/CLIPtion) is a fast, lightweight image captioning model built on top of CLIP. This fork updates it for ComfyUI's V3 node scheme and consolidates the node pack into a single, integrated node. Processing has been sped up for GPU inference, and a VRAM offload option has been added.
 
-## Node
+## CLIPtion Beam Search (Integrated) Node
 
-### CLIPtion Beam Search (Integrated)
+### Single Image
 
 <div align="center">
-<img width="800" height="468" alt="mask refine node sample" src="images/comfyui-cliption-integrated_sample_workflow_20260813.png">
+<img width="800" height="468" alt="single image sample workflow" src="images/comfyui-cliption-integrated_sample_workflow_20260814.png">
+</div>
+
+### Multiple Images
+
+<div align="center">
+<img width="800" height="351" alt="multiple images sample workflow" src="images/comfyui-cliption-integrated_multipul_images_sample_workflow_20260814.png">
 </div>
 
 Loads the CLIPtion decoder on demand at caption time (rather than at workflow-load time) and runs beam search to caption an image, ranking the resulting candidates by CLIP similarity to the input image.
 
-**Inputs**
+### Inputs
 
 | Name | Type | Description |
 | --- | --- | --- |
 | `clip` | `CLIP` | CLIP text encoder (must include CLIP-L). |
 | `clip_vision` | `CLIP_VISION` | CLIP vision encoder (must be CLIP-L). |
-| `image` | `IMAGE` | Image to caption. |
+| `image` | `IMAGE` | Input Image (s). |
+
+### Settings
+
+| Name | Type | Description |
+| --- | --- | --- |
 | `beam_width` | `INT` | Number of beams to maintain during search (default: 4). |
 | `unload_after_run` | `BOOLEAN` | Unload the CLIPtion decoder from VRAM after captioning (default: False). |
 | `device` (optional) | `["default", "cpu"]` | Inference device override. |
 
-**Output**
+### Output
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `STRING` | `STRING` (list) | Generated caption. |
+| `STRING` | `STRING` (list) | Generated caption (s). |
 
 The CLIPtion decoder weights (`CLIPtion_20241219_fp16.safetensors`) are downloaded automatically from [easygoing0114/ComfyUI-use-models](https://huggingface.co/easygoing0114/ComfyUI-use-models/tree/main) on Hugging Face the first time the node runs, and are saved to `ComfyUI/models/cliption` for reuse on subsequent runs. You can also place a copy of the file in that folder yourself ahead of time to skip the automatic download.
 
