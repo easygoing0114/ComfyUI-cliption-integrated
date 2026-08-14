@@ -36,7 +36,7 @@ Loads the CLIPtion decoder on demand at caption time (rather than at workflow-lo
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `beam_width` | `INT` | Number of beams to maintain during search (default: 4). |
+| `beam_width` | `INT` | Number of beams to maintain during search (default: 9). |
 | `unload_after_run` | `BOOLEAN` | Unload the CLIPtion decoder from VRAM after captioning (default: False). |
 | `device` (optional) | `["default", "cpu"]` | Inference device override. |
 
