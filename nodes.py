@@ -23,9 +23,10 @@ folder_paths.add_model_folder_path("cliption", _CLIPTION_MODELS_DIR)
 
 
 def _fix_punctuation_spacing(text: str) -> str:
-    """Remove stray whitespace before commas and periods left over from
-    CLIPTokenizer's BPE decoding (e.g. "cats , dogs ." -> "cats, dogs.")."""
-    return re.sub(r"\s+([,.])", r"\1", text)
+    """Remove stray whitespace before commas, periods, and apostrophes left
+    over from CLIPTokenizer's BPE decoding
+    (e.g. "cats , dogs . it ' s" -> "cats, dogs. it's")."""
+    return re.sub(r"\s+([,.'])", r"\1", text)
 
 
 class DecoderBlock(nn.Module):
