@@ -13,13 +13,13 @@ A streamlined fork of [pharmapsychotic/comfy-cliption](https://github.com/pharma
 ### Single Image
 
 <div align="center">
-<img width="800" height="468" alt="single image sample workflow" src="images/comfyui-cliption-integrated_sample_workflow_20260814.png">
+<img width="800" height="468" alt="single image sample workflow" src="images/comfyui-cliption-integrated_sample_workflow_20260918.png">
 </div>
 
 ### Multiple Images
 
 <div align="center">
-<img width="800" height="351" alt="multiple images sample workflow" src="images/comfyui-cliption-integrated_multipul_images_sample_workflow_20260814.png">
+<img width="800" height="351" alt="multiple images sample workflow" src="images/comfyui-cliption-integrated_multipul_images_sample_workflow_20260918.png">
 </div>
 
 Loads the CLIPtion decoder on demand at caption time (rather than at workflow-load time) and runs beam search to caption an image, ranking the resulting candidates by CLIP similarity to the input image.
