@@ -50,11 +50,11 @@ Loads the CLIPtion decoder on demand at caption time (rather than at workflow-lo
 
 The CLIPtion decoder weights (`CLIPtion_20241219_fp16.safetensors`) are downloaded automatically from [easygoing0114/ComfyUI-use-models](https://huggingface.co/easygoing0114/ComfyUI-use-models/tree/main) on Hugging Face the first time the node runs, and are saved to `ComfyUI/models/cliption` for reuse on subsequent runs. You can also place a copy of the file in that folder yourself ahead of time to skip the automatic download.
 
-## Recommended CLIP-SAE-ViT-L-14 Model
+## Recommended CLIP-GmP-ViT-L-14 Model
 
-For the `clip` and `clip_vision` inputs, we recommend [zer0int/CLIP-SAE-ViT-L-14](https://huggingface.co/zer0int/CLIP-SAE-ViT-L-14), a free, high-accuracy fine-tune of CLIP ViT-L/14 released by zer0int. This model has also been mirrored to the [easygoing0114/ComfyUI-use-models](https://huggingface.co/easygoing0114/ComfyUI-use-models/tree/main) repository above.
+For the `clip` and `clip_vision` inputs, we recommend [zer0int/CLIP-GmP-ViT-L-14](https://huggingface.co/zer0int/CLIP-GmP-ViT-L-14), a free, high-accuracy fine-tune of CLIP ViT-L/14 released by zer0int. This model has also been mirrored to the [easygoing0114/ComfyUI-use-models](https://huggingface.co/easygoing0114/ComfyUI-use-models/tree/main) repository above.
 
-Download `CLIP-SAE-ViT-L-14_FP32.safetensors` and place it in **both** of the following folders:
+Download `CLIP-GmP-ViT-L-14-FP32.safetensors` and place it in **both** of the following folders:
 
 - `ComfyUI/models/text_encoders`
 - `ComfyUI/models/clip_vision`
@@ -72,7 +72,7 @@ Restart ComfyUI. The node should now appear in the node search as **CLIPtion Bea
 
 - [pharmapsychotic/comfy-cliption](https://github.com/pharmapsychotic/comfy-cliption) — original ComfyUI node pack this fork is based on.
 - [pharmapsychotic/CLIPtion](https://huggingface.co/pharmapsychotic/CLIPtion) — the underlying CLIPtion model.
-- [zer0int/CLIP-SAE-ViT-L-14](https://huggingface.co/zer0int/CLIP-SAE-ViT-L-14) — recommended high-accuracy CLIP-L model, freely released by zer0int.
+- [zer0int/CLIP-GmP-ViT-L-14](https://huggingface.co/zer0int/CLIP-GmP-ViT-L-14) — recommended high-accuracy CLIP-L model, freely released by zer0int.
 
 ## License
 
